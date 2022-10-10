@@ -17,6 +17,10 @@ public enum ToasterType { case warning, error, success, info }
 public enum ToasterPosition { case top, bottom }
 ```
 
+## Example
+https://user-images.githubusercontent.com/2064984/194924335-0109f377-56f6-4a4c-a5b0-aeafdb7af55d.mov
+
+
 ## Usage
 ### Info Toaster
 ```
