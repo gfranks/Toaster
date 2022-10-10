@@ -315,18 +315,18 @@ public struct Toaster: ViewModifier {
 							}
 						}
 				)
-				.onAppear {
-					if self.autoDismiss {
-						DispatchQueue.main.asyncAfter(deadline: .now() + self.duration) {
-							withAnimation {
-								self.isShowing = false
-							}
-						}
+			}
+		}
+		.animation(.spring(), value: self.isShowing)
+		.onChange(of: self.isShowing) { isShowing in
+			if isShowing && self.autoDismiss {
+				DispatchQueue.main.asyncAfter(deadline: .now() + self.duration) {
+					withAnimation {
+						self.isShowing = false
 					}
 				}
 			}
 		}
-		.animation(.spring(), value: self.isShowing)
 	}
 	
 	public func body(content: Content) -> some View {
@@ -430,3 +430,4 @@ fileprivate struct ToasterCustom_Previews: PreviewProvider {
 		ToasterCustom()
 	}
 }
+
