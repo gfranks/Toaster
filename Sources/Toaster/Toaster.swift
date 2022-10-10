@@ -137,6 +137,8 @@ public class ToasterData: Equatable {
 		self.init(
 			title: title,
 			message: message,
+			titleFont: titleFont,
+			messageFont: messageFont,
 			titleColor: type.textColor,
 			messageColor: type.textColor,
 			icon: type.icon,
