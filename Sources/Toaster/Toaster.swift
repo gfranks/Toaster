@@ -9,10 +9,12 @@ import SwiftUI
 
 // MARK: - TOASTER TYPES
 
+/// ToasterType used for styling our Toaster
+/// This has premaid text and background colors as well as icons
 public enum ToasterType {
 	case warning, error, success, info
 	
-	public var textColor: Color {
+	var textColor: Color {
 		switch self {
 		case .warning:
 			return .black
@@ -25,7 +27,7 @@ public enum ToasterType {
 		}
 	}
 	
-	public var backgroundColor: Color {
+	var backgroundColor: Color {
 		switch self {
 		case .warning:
 			return .yellow
@@ -38,7 +40,7 @@ public enum ToasterType {
 		}
 	}
 	
-	public var icon: String {
+	var icon: String {
 		switch self {
 		case .warning:
 			return "exclamationmark.triangle.fill"
@@ -54,72 +56,115 @@ public enum ToasterType {
 
 // MARK: - TOASTER DATA
 
+/// Toaster data used to create our Toast message
 public class ToasterData: Equatable {
 	
 	let title: String
 	let message: String?
 	var titleFont: Font
-	var bodyFont: Font
-	var type: ToasterType
-	var textColor: Color?
-	var backgroundColor: Color?
+	var messageFont: Font
+	var icon: String
+	var iconColor: Color
+	var titleColor: Color
+	var messageColor: Color
+	var backgroundColor: Color
 	var position: ToasterPosition
 	var autoDismiss: Bool
 	var duration: CGFloat
 	
+	/// Creates a ToasterData
+	/// - Parameters:
+	///  - title: The title of this Toaster
+	///  - message: The message of this Toaster
+	///  - titleFont: The title font to use, defaults to `.system(.title)`
+	///  - messageFont: The title font to use, defaults to `.system(.body)`
+	///  - icon: The icon to use with this Toaster. If none provided, will use premaid icon based on the ToasterType
+	///  - iconColor: The icon color to use for all icons within the Toaster. If none provided, will use premaid Colors based on the ToasterType
+	///  - titleColor: The text color to use for the title within the Toaster. If none provided, will use premaid Colors based on the ToasterType
+	///  - messageColor: The text color to use for the message within the Toaster. If none provided, will use premaid Colors based on the ToasterType
+	///  - backgroundColor: The background color of this Toaster. If none provided, will use premaid Colors based on the ToasterType
+	///  - position: The position the Toaster should be displayed from [top, bottom]
+	///  - autoDismiss: Whether the Toaster should auto dismiss after the duration has lasped
+	///  - duration: The duration before the Toaster will aut dismiss
 	public init(
 		title: String = "",
 		message: String? = nil,
 		titleFont: Font = .system(.title),
-		bodyFont: Font = .system(.body),
-		type: ToasterType = .success,
-		textColor: Color? = nil,
-		backgroundColor: Color? = nil,
+		messageFont: Font = .system(.body),
+		titleColor: Color,
+		messageColor: Color,
+		icon: String,
+		iconColor: Color,
+		backgroundColor: Color,
 		position: ToasterPosition = .top,
 		autoDismiss: Bool = true,
 		duration: CGFloat = 5
 	) {
 		self.title = title
 		self.message = message
-		self.type = type
-		self.position = position
-		
-		if let textColor = textColor {
-			self.textColor = textColor
-		}
-		else {
-			self.textColor = type.textColor
-		}
-		
-		if let backgroundColor = backgroundColor {
-			self.backgroundColor = backgroundColor
-		}
-		else {
-			self.backgroundColor = type.backgroundColor
-		}
-		
 		self.titleFont = titleFont
-		self.bodyFont = bodyFont
+		self.messageFont = messageFont
+		self.titleColor = titleColor
+		self.messageColor = messageColor
+		self.icon = icon
+		self.iconColor = iconColor
+		self.backgroundColor = backgroundColor
+		self.position = position
 		self.autoDismiss = autoDismiss
 		self.duration = duration
+	}
+	
+	/// Creates a ToasterData
+	/// - Parameters:
+	///  - title: The title of this Toaster
+	///  - message: The message of this Toaster
+	///  - titleFont: The title font to use, defaults to `.system(.title)`
+	///  - messageFont: The title font to use, defaults to `.system(.body)`
+	///  - type: The type of this Toaster. See `ToasterType`
+	///  - position: The position the Toaster should be displayed from [top, bottom]
+	///  - autoDismiss: Whether the Toaster should auto dismiss after the duration has lasped
+	///  - duration: The duration before the Toaster will aut dismiss
+	public convenience init(
+		title: String = "",
+		message: String? = nil,
+		titleFont: Font = .system(.title),
+		messageFont: Font = .system(.body),
+		type: ToasterType = .success,
+		position: ToasterPosition = .top,
+		autoDismiss: Bool = true,
+		duration: CGFloat = 5
+	) {
+		self.init(
+			title: title,
+			message: message,
+			titleColor: type.textColor,
+			messageColor: type.textColor,
+			icon: type.icon,
+			iconColor: type.textColor,
+			backgroundColor: type.backgroundColor,
+			position: position,
+			autoDismiss: autoDismiss,
+			duration: duration
+			
+		)
 	}
 	
 	@ViewBuilder
 	public func makeToast<ViewContext>(viewContext: ViewContext) -> some View where ViewContext: View {
 		HStack(alignment: .firstTextBaseline) {
-			Image(systemName: self.type.icon)
+			Image(systemName: self.icon)
 				.imageScale(.medium)
-				.foregroundColor(self.textColor)
+				.foregroundColor(self.iconColor)
 			
 			VStack(alignment: .leading) {
 				Text(self.title)
 					.font(self.titleFont)
-					.foregroundColor(self.textColor)
+					.foregroundColor(self.titleColor)
 				
 				if let message = self.message {
 					Text(message)
-						.font(self.bodyFont)
-						.foregroundColor(self.textColor)
+						.font(self.messageFont)
+						.foregroundColor(self.messageColor)
 				}
 			}
 			
@@ -134,12 +179,13 @@ public class ToasterData: Equatable {
 	}
 	
 	public static func == (lhs: ToasterData, rhs: ToasterData) -> Bool {
-		lhs.title == rhs.title && lhs.message == rhs.message && lhs.type == rhs.type && lhs.position == rhs.position
+		lhs.title == rhs.title && lhs.message == rhs.message && lhs.position == rhs.position
 	}
 }
 
 // MARK: - TOASTER POSITION
 
+/// The position of which the Toaster will be displayed from
 public enum ToasterPosition {
 	case top, bottom
 	
@@ -155,6 +201,7 @@ public enum ToasterPosition {
 
 // MARK: - TOASTER
 
+/// A fully customizable Toaster simulating an Android "Toast"
 public struct Toaster: ViewModifier {
 	
 	@Binding private var isShowing: Bool
@@ -167,6 +214,17 @@ public struct Toaster: ViewModifier {
 	private var overlayBackgroundColor: Color
 	private var slideOverContent: (_ content: Content) -> AnyView
 	
+	/// Creates a robust Toaster with a customizable View
+	/// - Parameters:
+	///  - isShowing: Binding<Bool> determining if this Toaster should be showing
+	///  - position: The position the Toaster should be displayed from [top, bottom]
+	///  - autoDismiss: Whether the Toaster should auto dismiss after the duration has lasped
+	///  - duration: The duration before the Toaster will aut dismiss
+	///  - enableTapToDismiss: When enabled, the Toaster can be dismissed by simply tapping the View
+	///  - enableBackgroundTapToDismiss: When enabled, the Toaster can be dismissed by simply tapping the behind the View
+	///  - enableDragDetection: When enabled, the Toaster can be dismissed by dragging up or down
+	///  - overlayBackgroundColor: The background overlayed behind the Toaster. This will appear as full screen. Useful for custom Toasters
+	///  - slideOverContent: The Toaster content to be overlayed
 	public init(
 		isShowing: Binding<Bool>,
 		position: ToasterPosition = .top,
@@ -288,7 +346,11 @@ public struct Toaster: ViewModifier {
 }
 
 public extension Toaster {
-	
+
+	/// Creates a simple toaster based on the ToasterData
+	/// - Parameters:
+	///  - isShowing: Binding<Bool> determining if this Toaster should be showing
+	///  - data: ToasterData including the information you wish to display
 	init(isShowing: Binding<Bool>, data: ToasterData) {
 		self.init(isShowing: isShowing, position: data.position, autoDismiss: data.autoDismiss, duration: data.duration) { viewContext in
 			AnyView(data.makeToast(viewContext: viewContext))
@@ -298,6 +360,7 @@ public extension Toaster {
 
 // MARK: - PREVIEWS
 
+/// Robust Toaster example using a custom View
 fileprivate struct ToasterCustom: View {
 	
 	@State private var isShowing: Bool = false
@@ -348,6 +411,7 @@ fileprivate struct ToasterCustom: View {
 	}
 }
 
+/// Simple Toaster example using ToasterData
 struct ToasterInfo_Previews: PreviewProvider {
 	static var previews: some View {
 		VStack {
