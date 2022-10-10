@@ -18,8 +18,7 @@ public enum ToasterPosition { case top, bottom }
 ```
 
 ## Example
-https://user-images.githubusercontent.com/2064984/194924335-0109f377-56f6-4a4c-a5b0-aeafdb7af55d.mov
-
+https://user-images.githubusercontent.com/2064984/194928017-04f92ab4-c121-427e-a35a-be78ac088eaa.mov
 
 ## Usage
 ### Info Toaster
